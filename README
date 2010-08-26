@@ -1,0 +1,41 @@
+Adds an "About Me" page to the vanilla forums profile page with extended fields.
+
+Current Fields Include:
+Real Name, Nick Name, Favorite Quote, Location, Birthday, Relationship Status, Biography, Employer, Job Title, High School, College, Interests, Music, Games, Movies, TV, and Books.
+
+The Css file is located in the /design folder, and am.default_theme.css is used by default. 
+
+this can be edited to suit your needs, or replaced; just change the filename at the top of class.aboutme.plugin.php
+
+The css file has all of the colors specifically at the bottom to make it easy to just change the theme's colors.
+
+I will try not to change any css classes in future versions for those of you who customize the css.
+
+Changes in Version 1.0:
+-[fix?] not sure if the mistake was made after version 9.0, but fixed the issue with a permission error for non-administrators when viewing the profile page.
+-[fix] fixed the 'edit my details' button not appearing for non-admins, made the button appear on all profiles for admins.
+-[fix] fixed the mistake made leaving some things that should be hidden when the user has not yet set up their profile.
+-[change] some minor css changes to the default theme for cleaner appearance and to prevent overflow
+-[change] decreased the number of characters for some fields.
+
+-[in progress] trying to query normal user data to display on the profile page with current data. (such as username and picture)
+-[proposed] remove table added with the addon, use the normal user table. (since the dev's added some of the same columns there already...)
+-[proposed] replace the 'info.php' module on the profile with one including the extended fields.
+
+Changes in version 0.9:
+- Integrated vanilla default theme
+- Cleaned up CSS file for easy editing
+- Minor CSS fixes.
+- Sorry if you already customised the CSS, as I changed a lot! (This was so I do not have to in the future.)
+
+
+Version 0.2.1 made a minor correction on hiding the nickname.
+
+Changes in version 0.2:
+- Fixed the bug with the edit form not confirming the information was saved and closing as it should.
+- Changed the Relationship Status field to a drop-down selection menu
+- Added birthday field with drop-down selector, and options to hide the entire birthday or just the year.
+- Made various labels disappear when there is no info.
+
+
+Unfortunately I cannot find a solution yet to having to select a birthday every time you edit your information, although this may not be my fault, as the form->date function should get the field data when the form is opened...
