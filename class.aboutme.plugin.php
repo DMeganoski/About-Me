@@ -3,7 +3,7 @@
 $PluginInfo['AboutMe'] = array(
 	'Name' =>		'About Me',
   	'Description' => 'This is a plugin to add a tab to the profile page, with various fields for a more detailed user profile.',
-   'Version' => '0.9',
+   'Version' => '1.x',
    'Author' => "Darryl Meganoski",
    'AuthorEmail' => 'zodiacdm@gmail.com',
    'AuthorUrl' => 'www.realgamersusepc.com',
