@@ -11,6 +11,11 @@ The css file has all of the colors specifically at the bottom to make it easy to
 
 I will try not to change any css classes in future versions for those of you who customize the css.
 
+Changes in Version 1.1:
+-[fix] Updated the way render is called in the profile controller. A function was changed a while back which made the rest of the profile content disappear.
+-[change] Changed the edit and views into two separate functions. Just easier to read and edit; really.
+-[change] Cleaned up comments, had a lot of bits and pieces from other plugins to use as a guide. Other little tweaks since getting used to php Garden.
+
 Changes in Version 1.0:
 -[fix?] not sure if the mistake was made after version 9.0, but fixed the issue with a permission error for non-administrators when viewing the profile page.
 -[fix] fixed the 'edit my details' button not appearing for non-admins, made the button appear on all profiles for admins.
