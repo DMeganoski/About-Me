@@ -1,126 +1,152 @@
-<?php
+<?php if (!defined('APPLICATION')) exit();
 // Define the plugin:
 $PluginInfo['AboutMe'] = array(
-	'Name' =>		'About Me',
-  	'Description' => 'This is a plugin to add a tab to the profile page, with various fields for a more detailed user profile.',
-   'Version' => '1.x',
+    'Name' => 'AboutMe',
+   'Description' => 'This is a plugin to add a tab to the profile page, with various fields for a more detailed user profile.',
+   'Version' => '1.1',
    'Author' => "Darryl Meganoski",
    'AuthorEmail' => 'zodiacdm@gmail.com',
-   'AuthorUrl' => 'www.realgamersusepc.com',
+   'AuthorUrl' => 'www.facebook.com/zodiacdm',
    'HasLocale' => TRUE,
 
 );
 
 class AboutMe implements Gdn_IPlugin {
 
+//==========Random Variables for later Use
+//$Controller = $Sender->ControllerName;
 
-	public function ProfileController_EditMyAccountAfter_Handler(&$Sender) {
-		echo '<li>';
-		echo $Sender->Form->Label('Nick Name', 'NickName');
-		echo $Sender->Form->TextBox('OtName');
-		echo '</li>';
-	}
-	/**
-	 * Add the tab to the profile for the 'About Me'page
-	 *
-	 * @param unknown_type $Sender
-	 */
-	public function ProfileController_AddProfileTabs_handler(&$Sender) {
-		$Sender->AddProfileTab(Translate("AboutMe_ProfileTab"), "/profile/aboutme/view/".$Sender->User->UserID."/".GDN_Format::Url($Sender->User->Name));
-		$Sender->AddCssFile('/plugins/AboutMe/design/am.default_theme.css'); // change this to use a different css stylesheet i.e. from am.default_theme.css to am.realgamerstheme.css
+/**
+ * Add to profile @ tabs - link to view page.
+ * If you would like this to be the first 'tab' on the list, go to
+ * 'vanilla_folder/applications/dashboard/controllers/class.profilecontroller.php'
+ * and add a
+ * $this->FireEvent('BeforeAddProfileTabs');
+ * somewhere around line 736 of the file,
+ * and change the name of the magic event below to ProfileController_BeforeAddProfileTabs_handler
+ */
+public function ProfileController_AfterAddProfileTabs_handler(&$Sender) {
+   $Sender->AddProfileTab('aboutme', "/profile/aboutme/".$Sender->User->UserID."/".Gdn_Format::Url($Sender->User->Name), 'AboutMe', 'About Me');
+   $Sender->AddCssFile('/plugins/AboutMe/design/am.default_theme.css');
 }
 
-	
+
 /**
- * Add to profile @ side menu - link to edit details
+ * Adds the button to the side menu for filling in info
  * @param $Sender
  */
 public function ProfileController_AfterAddSideMenu_Handler(&$Sender) {
       $SideMenu = $Sender->EventArguments['SideMenu'];
       $Session = Gdn::Session();
       $ViewingUserID = $Session->UserID;
- 		if ($Sender->User->UserID != $ViewingUserID) {
-         $Sender->Permission('Garden.Users.Edit');
-         $AboutMeUserID = $Sender->User->UserID;
-      } else {
-      	$AboutMeUserID = $ViewingUserID = Gdn::Session()->UserID; 
-      }
+
       if ($Sender->User->UserID == $ViewingUserID) {
-         $SideMenu->AddLink('Options', T('Edit My Details'), '/profile/aboutme/edit/'.$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name), FALSE, array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', T('Edit My Details'), '/profile/editme/'.$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name), FALSE, array('class' => 'Popup'));
       } else {
-      	$SideMenu->AddLink('Options', T('Edit My Details'), '/profile/aboutme/edit/'.$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name), 'Garden.Users.Edit', array('class' => 'Popup'));
+      	$SideMenu->AddLink('Options', T('Edit My Details'), '/profile/editme/'.$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name), 'Garden.Users.Edit', array('class' => 'Popup'));
       	return;
       }
 }
 
-	/**
-	 * Create a controller for 'edit' or 'view' commands
-	 * @param unknown_type $Sender
-	 * @param unknown_type $params - three elements - ['edit' or 'view' | user_id | user_name]
-	 */
-	public function ProfileController_AboutMe_Create($Sender, $params) {
-		$command = $params[0];
-		$Sender->id = $params[1];
-		$Sender->name = $params[2];
-		
-		$ViewingUserID = $Session->UserID;
-		if ($Sender->User->UserID != $ViewingUserID) {
-		$AboutMeUserID = $Sender->User->UserID;
-		} else {
-      	$AboutMeUserID = $ViewingUserID = Gdn::Session()->UserID; 
-		}
-		
-		$SQL = Gdn::SQL();
-     	$Session = Gdn::Session();
-		
-		$AboutMeModel = new Gdn_Model('AboutMe');
-		$AboutMeData = $AboutMeModel->GetWhere(array('UserID' => $Sender->id));
-		$AboutMe = $AboutMeData->FirstRow();
-		$Sender->AboutMe = $AboutMe;
-		
-		$Sender->User = $SQL
-			->Select('*')
-        	->From('User')
-        	->Where(array('UserID' => $Sender->id))
-        	->Get()
-        	->FirstRow();
-		
-		// If command is view, show the aboutme_view page
-		if($command == 'view') {
-			$Sender->View = dirname(__FILE__).DS.'views'.DS.'aboutme_view.php'; 
-		}
-		// If command is edit, create the form
-		else if($command == 'edit') { 
-      		$Sender->Form = new Gdn_Form();
-      		$Sender->Form->SetModel($AboutMeModel);
-      		if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
-      			//AND If the table is empty, set the form data
-				if(!empty($Sender->AboutMe)) {
-					$Sender->Form->SetData($Sender->AboutMe); 
-				}
-      		}
-			else { //starts save form
-      			if(!empty($Sender->AboutMe)) {
-					$Sender->Form->SetFormValue('ProfileID', $Sender->AboutMe->ProfileID);
-      			}
-      			$Sender->Form->SetFormValue('UserID', $Sender->id);
-				$Data = $Sender->Form->FormValues();
-				if ($Sender->Form->Save() !== FALSE) {
-            		$Profile = ArrayValue('$AboutMe', $Data);
-               		if ($Data !== FALSE) {
-                  		AddActivity($Sender->id, 'EditProfile','<a href="/profile/'.$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name).'">'.$Sender->User->Name.'</a>'); }
-                  		
-            			$Sender->StatusMessage = Gdn::Translate("Your settings have been saved.");            		 
-					}
-     			else{
-					$Sender->StatusMessage = T("Oops, changes not saved");
-     			}
-      		} //ends save form
-      	$Sender->View = dirname(__FILE__).DS.'views'.DS.'aboutme_edit.php';
-      	}
-	$Sender->Render();
+
+/**
+* Create a controller for 'edit' or 'view' commands
+* @param unknown_type $Sender
+* @param unknown_type $params - three elements - ['edit' or 'view' | user_id | user_name]
+*/
+public function ProfileController_AboutMe_Create(&$Sender, $params) {
+   $Sender->UserID = ArrayValue(0, $Sender->RequestArgs, '');
+   $Sender->UserName = ArrayValue(1, $Sender->RequestArgs, '');
+   $Sender->GetUserInfo($Sender->UserID, $Sender->UserName);
+   $Sender->SetTabView('aboutme', dirname(__FILE__).DS.'views'.DS.'aboutme_view.php', 'Profile', 'Dashboard');
+       //$UserInfoModule = new UserInfoModule($this);
+       //$UserInfoModule->User = $this->User;
+       //$UserInfoModule->Roles = $this->Roles;
+
+   $AboutMeModel = new Gdn_Model('AboutMe');
+   $AboutMeData = $AboutMeModel->GetWhere(array('UserID' => $Sender->UserID));
+   $AboutMe = $AboutMeData->FirstRow();
+   $Sender->AboutMe = $AboutMe;
+
+   $Sender->HandlerType = HANDLER_TYPE_NORMAL;
+   $Sender->Render();
+
 }
 
+public function ProfileController_EditMe_Create(&$Sender, $params) {
+   $this->UserID = ArrayValue(0, $Sender->RequestArgs, '');
+   $this->UserName = ArrayValue(1, $Sender->RequestArgs, '');
+   $Sender->GetUserInfo($Sender->UserID, $Sender->UserName);
+   // change this to use a different css stylesheet i.e. from am.default_theme.css to am.realgamerstheme.css
+   $Sender->AddCssFile('/plugins/AboutMe/design/am.default_theme.css');
+
+   if (!is_numeric($this->UserID)) {
+
+      echo '<div class="Empty">Oops, thats not right...</div>';
+      $Sender->Render();
+   }
+   $AboutMeModel = new Gdn_Model('AboutMe');
+   $AboutMeData = $AboutMeModel->GetWhere(array('UserID' => $this->UserID));
+   $AboutMe = $AboutMeData->FirstRow();
+   $Sender->AboutMe = $AboutMe;
+
+   $Session = Gdn::Session();
+   $ViewingUserID = $Session->UserID;
+   if ($Sender->User->UserID != $ViewingUserID) {
+      $Sender->Permission('Garden.Users.Edit');
+      $AboutMeUserID = $Sender->User->UserID;
+   } else {
+      $AboutMeUserID = $ViewingUserID = Gdn::Session()->UserID;
+   }
+
+   //$Sender->AddSideMenu('plugin/userlist');
+   $Sender->Form = new Gdn_Form();
+   $Sender->Form->SetModel($AboutMeModel);
+   if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
+      //AND If the table is empty, set the form data
+      if(!empty($Sender->AboutMe)) {
+	 $Sender->Form->SetData($Sender->AboutMe);
+      }
+   } else { //starts save form
+      if(!empty($Sender->AboutMe)) {
+	 $Sender->Form->SetFormValue('ProfileID', $Sender->AboutMe->ProfileID);
+      }
+      $Sender->Form->SetFormValue('UserID', $this->UserID);
+      $Data = $Sender->Form->FormValues();
+      if ($Sender->Form->Save() !== FALSE) {
+	 $Sender->StatusMessage = Gdn::Translate("Your settings have been saved.");
+         // Trying to record activity if the person changed his/her info
+         // AddActivity($AboutMeUserID, 'Story', 'has updated his profile');
+      } else {
+	 $Sender->StatusMessage = T("Oops, changes not saved");
+      }
+   } //ends save form
+   $Sender->View = dirname(__FILE__).DS.'views'.DS.'aboutme_edit.php';
+
+   //$Sender->HandlerType = HANDLER_TYPE_NORMAL;
+   $Sender->Render();
+}
+
+/*public function ProfileController_AfterPreferencesDefined_Handler(&$Sender) {
+   $Sender->Preferences['Profile Information Visibility'] = array(
+
+      'Everyone.Birthyear' => T('Just hide the year.'),
+      'Everyone.HideSome' => T('Hide my info from the public. (unregistered users)'),
+      'Everyone.HideAll' => T('Hide my info from everyone except staff.'),
+      'Everyone.Birthday' => T('Show my birthday.'),
+
+      'Pulbic.Birthday' => T('Show my birthday.'),
+      'Pulbic.HideAll' => T('Hide my info from everyone except staff.'),
+      'Pulbic.Birthyear' => T('Just hide the year.'),
+      'Pulbic.HideSome' => T('Hide my info from the public. (unregistered users)'),
+
+
+
+
+      );
+
+
+}*/
 /**
  *
  * Create the database table and columns for the information to be saved.
@@ -153,28 +179,11 @@ public function Setup(){
         ->Column('Bks', 'varchar(128)', TRUE)
         ->Column('Bio', 'varchar(1024)', TRUE)
         ->Set(FALSE, FALSE);
-        
-// Insert some activity types
-///  %1 = ActivityName
-///  %2 = ActivityName Possessive
-///  %3 = RegardingName
-///  %4 = RegardingName Possessive
-///  %5 = Link to RegardingName's Wall
-///  %6 = his/her
-///  %7 = he/she
-///  %8 = RouteCode & Route
-
-//  X created a group
-	$SQL = Gdn::SQL();
-	if ($SQL->GetWhere('ActivityType', array('Name' => 'EditProfile'))->NumRows() == 0)
-   		$SQL->Insert('ActivityType', array('AllowComments' => '0', 'Name' => 'EditProfile', 'FullHeadline' => '%1$s edited %6$s profile.', 'ProfileHeadline' => '%1$s edited %6$s profile.', 'Public' => '1'));
-   
-        
 	}
 }
 
 Gdn::FactoryInstall('AboutMeModel','AboutMeModel',
-PATH_PLUGINS.DS.'AboutMe'.DS.'class.aboutmemodel.php',
+PATH_PLUGINS.DS.'AboutMe'.DS.'class.aboutme.plugin.php',
 Gdn::FactoryInstance,NULL,FALSE);
 
 
