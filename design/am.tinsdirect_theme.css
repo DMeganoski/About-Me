@@ -1,0 +1,167 @@
+/* This is the stylesheet for the "AboutMe" Plugin */
+
+/*=======ALL COLORS=== are located @ the BOTTOM for convenience===*/
+
+/*======General Styles=========*/
+div {
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+}
+div.aboutme { /*background*/
+	width: 95%;
+	margin: 10px auto;
+	padding: 10px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    box-shadow: 0 0 2px #999999;
+    -moz-box-shadow: 0 0 2px #999999;
+    -webkit-box-shadow: 0 0 2px #999999;
+}
+
+div.aboutme table {
+	width: 100%;
+	margin: 0px auto;
+    max-width: 100%;
+}
+
+div.aboutme tr {
+	padding-bottom: 0;
+}
+
+div.aboutme td {
+	padding-left: 10px;
+	padding-right: 10px;
+	text-align: center;
+	padding-bottom: 2px;
+}
+div.aboutme td.bordertop {
+	height: 1px;
+	widht: 100%;
+	border-top: 1px solid;
+}
+
+div.aboutme td.borderbottom {
+	height: 1px;
+	widht: 100%;
+	border-bottom: 1px solid;
+}
+
+div.aboutme td.info {
+
+}
+
+div.aboutme td.label {
+	padding: 0px 10px 0px 10px;
+	font-weight: bold;
+	min-width: 80px;
+	font-size: 105%;
+}
+
+div.aboutme td.tablelabel {
+	padding: 10px 0px 10px 0px;
+	min-width: 80px;
+	font-weight: bold;
+}
+
+div.aboutme td.tablelabel h2{
+	font-weight: bold;
+	font-size: 130%;
+	margin-bottom: 0px;
+	border-bottom: none;
+}
+
+/*================First (Name Info) Table =================*/
+
+div.aboutme table#nameinfo td.name {
+	font-size: 150%;
+	font-weight: bold;
+	padding-top: 5px;
+	padding-bottom: 15px;
+}
+
+/*================Second (Quote Info) Table================*/
+
+div.aboutme table#quoteinfo td.quote {
+	font-weight: bold;
+	font-style: italic;
+}
+
+/*================Third (Basic Info) Table===================*/
+
+div.aboutme table#basicinfo td {
+    min-width: 33%;
+}
+
+
+/*================Fourth (Biography) Table==================*/
+
+/*================Fifth (Career) Table======================*/
+
+/*================Sixth (Education) Table====================*/
+
+/*================Seventh (Interests) Table===================*/
+
+/*====================Form Fixes================*/
+
+div.Popup form ul li td {
+	min-width: 250px;
+	max-width: 300px;
+	text-align: center;
+}
+
+#Popup textarea#Form_Bio {
+	width: 450px;
+}
+#Popup textarea#Form_Quote {
+	width: 450px;
+	min-height: 70px;
+	height: 70px;
+}
+
+#Popup input#Form_Inter,
+#Popup input#Form_Mus,
+#Popup input#Form_Gam,
+#Popup input#Form_Mov,
+#Popup input#Form_TV,
+#Popup input#Form_Bks {
+	width: 450px;
+}
+
+/*================COLORS ONLY====================*/
+
+div.aboutme { /* Container */
+	background: transparent; /* Default Dark Light Blue */
+}
+
+div.aboutme table#nameinfo td.name { /*Name at the Top */
+	color: #0000FF; /* Default Blue Text */
+}
+
+div.aboutme table#quoteinfo td.quote {
+	color: #474747; /* Grey Quote */
+}
+
+div.aboutme td.tablelabel h2{ /* Large Table Labels */
+	color: #333333; /* Default Blue Text */
+}
+
+div.aboutme td.label { /* Field Label */
+	color: #0000FF; /* Default Blue Text */
+	background: #CCC; /* Default Light Light Blue */
+}
+
+div.aboutme td.info { /* Field Data */
+	color: #333333; /* Grey Text */
+	background: #CCC; /* Default Light Light Blue */
+}
+
+div.aboutme td.bordertop { /* Border at the top of information */
+	border-color: #DDD; /* Default border blue */
+	background: #DDD; /* Default Light Light Blue */
+}
+
+div.aboutme td.borderbottom { /* Border at the bottom of information */
+	border-color: #BBB; /* Default border blue */
+	background: #BBB; /* Default Light Light Blue */
+}

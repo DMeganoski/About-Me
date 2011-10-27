@@ -1,0 +1,166 @@
+/* This is a custom colored (green/white/gray) stylesheet for the "AboutMe" Plugin based on the realgamersusepc.com theme */
+
+/*=======ALL COLORS=== are located @ the BOTTOM for convenience===*/
+
+/*======General Styles=========*/
+
+div.aboutme { /*background*/
+	width: 800px;
+	margin: 10px auto;
+	padding: 10px;
+}
+
+div.aboutme table {
+	width: 100%;
+	margin: 0px auto;
+}
+
+div.aboutme tr {
+	padding-bottom: 0;
+}
+
+div.aboutme td {
+	padding-left: 10px;
+	padding-right: 10px;
+	text-align: center;
+	padding-bottom: 2px;
+}
+div.aboutme td.bordertop {
+	height: 1px;
+	widht: 100%;
+	border-top: 1px solid;
+}
+
+div.aboutme td.borderbottom {
+	height: 1px;
+	widht: 100%;
+	border-bottom: 1px solid;
+}
+
+div.aboutme td.info {
+	
+}
+
+div.aboutme td.label {
+	padding: 0px 10px 0px 10px;
+	font-weight: bold;
+	min-width: 80px;
+	font-size: 105%;
+}
+
+div.aboutme td.tablelabel {
+	padding: 10px 0px 10px 0px;
+	min-width: 80px;
+	font-weight: bold;
+}
+
+div.aboutme td.tablelabel h2{
+	font-weight: bold;
+	font-size: 130%;
+	margin-bottom: 0px;
+	border-bottom: none;
+}
+
+/*================First (Name Info) Table =================*/
+
+div.aboutme table#nameinfo td.name {
+	font-size: 150%;
+	font-weight: bold;
+	padding-top: 5px;
+	padding-bottom: 15px;
+}
+
+/*====================User Photo=====================*/
+
+div.aboutme div.photo {
+	float: left;
+	position: absolute;
+}
+
+
+/*================Second (Quote Info) Table================*/
+
+div.aboutme table#quoteinfo {
+	width: 100%;
+	float: right;
+	padding-left: 100px;
+}
+
+div.aboutme table#quoteinfo td.quote {
+	font-weight: bold;
+	font-style: italic;
+}
+
+/*================Third (Basic Info) Table===================*/
+
+/*================Fourth (Biography) Table==================*/
+
+/*================Fifth (Career) Table======================*/
+
+/*================Sixth (Education) Table====================*/
+
+/*================Seventh (Interests) Table===================*/
+
+/*====================Form Fixes================*/
+
+div.Popup form ul li td {
+	min-width: 250px;
+	max-width: 300px;
+	text-align: center;
+}
+
+#Popup textarea#Form_Bio {
+	width: 450px;
+}
+#Popup textarea#Form_Quote {
+	width: 450px;
+	min-height: 70px;
+	height: 70px;
+}
+
+#Popup input#Form_Inter,
+#Popup input#Form_Mus,
+#Popup input#Form_Gam,
+#Popup input#Form_Mov,
+#Popup input#Form_TV,
+#Popup input#Form_Bks {
+	width: 450px;
+}
+
+/*================COLORS ONLY====================*/
+
+div.aboutme { /* Container */
+background: #FFFFFF; /* White */
+}
+
+div.aboutme table#nameinfo td.name { /*Name at the Top */
+	color: #009900; /* Default Blue Text */
+}
+
+div.aboutme table#quoteinfo td.quote {
+	color: #474747; /* Gray Quote */
+}
+
+div.aboutme td.tablelabel h2{ /* Large Table Labels */
+	color: #009900; /* Default Blue Text */
+}
+
+div.aboutme td.label { /* Field Label */
+	color: #009900; /* Default Blue Text */
+	background: #FFFFFF; /* Default Light Light Blue */
+}
+
+div.aboutme td.info { /* Field Data */
+	color: #333333; /* Gray Text */
+	background: #FFFFFF; /* Default Light Light Blue */
+}
+
+div.aboutme td.bordertop { /* Border at the top of information */
+	border-color: #CCCCCC; /* Default border blue */
+	background: #FFFFFF; /* Default Light Light Blue */
+}
+
+div.aboutme td.borderbottom { /* Border at the bottom of information */
+	border-color: #CCCCCC; /* Default border blue */
+	background: #FFFFFF; /* Default Light Light Blue */
+}
