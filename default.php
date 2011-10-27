@@ -74,6 +74,7 @@ public function ProfileController_AboutMe_Create(&$Sender, $params) {
 }
 
 public function ProfileController_EditMe_Create(&$Sender, $params) {
+
    $this->UserID = ArrayValue(0, $Sender->RequestArgs, '');
    $this->UserName = ArrayValue(1, $Sender->RequestArgs, '');
    $Sender->GetUserInfo($Sender->UserID, $Sender->UserName);

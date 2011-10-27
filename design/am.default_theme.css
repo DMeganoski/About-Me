@@ -21,6 +21,16 @@ div.aboutme table {
     max-width: 100%;
 }
 
+div.aboutme table.half {
+	max-width: 50%;
+	float: left;
+
+}
+
+div.aboutme table.half td {
+	text-align: left;
+}
+
 div.aboutme tr {
 	padding-bottom: 0;
 }
@@ -69,12 +79,37 @@ div.aboutme td.tablelabel h2{
 
 /*================First (Name Info) Table =================*/
 
+div.aboutme table.hasphoto {
+	float: left;
+	max-width: 70%;
+}
+
+
 div.aboutme table#nameinfo td.name {
 	font-size: 150%;
 	font-weight: bold;
 	padding-top: 5px;
 	padding-bottom: 15px;
+	text-align: left;
 }
+
+div.aboutme table#nameinfo td.info {
+	text-align:left;
+}
+
+/*====================User Photo=====================*/
+
+div.aboutme table#photoinfo {
+	max-width: 30%;
+	float: left;
+}
+
+
+div.aboutme td.photo img {
+	width: 128px;
+	height: 128px;
+}
+
 
 /*================Second (Quote Info) Table================*/
 

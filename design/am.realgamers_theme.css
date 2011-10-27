@@ -74,7 +74,11 @@ div.aboutme table#nameinfo td.name {
 
 div.aboutme div.photo {
 	float: left;
-	position: absolute;
+}
+
+div.aboutme div.photo img {
+	width: 128px;
+	height: 128px;
 }
 
 
