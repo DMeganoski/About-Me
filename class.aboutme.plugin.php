@@ -1,9 +1,8 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 // Define the plugin:
-$PluginInfo['AboutMe'] = array(
-    'Name' => 'AboutMe',
+$PluginInfo['About Me'] = array(
    'Description' => 'This is a plugin to add a tab to the profile page, with various fields for a more detailed user profile.',
-   'Version' => '1.1',
+   'Version' => '0.9',
    'Author' => "Darryl Meganoski",
    'AuthorEmail' => 'zodiacdm@gmail.com',
    'AuthorUrl' => 'www.facebook.com/zodiacdm',
@@ -25,9 +24,9 @@ class AboutMe implements Gdn_IPlugin {
  * somewhere around line 736 of the file,
  * and change the name of the magic event below to ProfileController_BeforeAddProfileTabs_handler
  */
-public function ProfileController_AfterAddProfileTabs_handler(&$Sender) {
+public function ProfileController_AddProfileTabs_handler(&$Sender) {
    $Sender->AddProfileTab('aboutme', "/profile/aboutme/".$Sender->User->UserID."/".Gdn_Format::Url($Sender->User->Name), 'AboutMe', 'About Me');
-   $Sender->AddCssFile('/plugins/AboutMe/design/am.default_theme.css');
+   $Sender->AddCssFile('/plugins/AboutMe/design/am.tinsdirect_theme.css');
 }
 
 
@@ -58,6 +57,7 @@ public function ProfileController_AboutMe_Create(&$Sender, $params) {
    $Sender->UserID = ArrayValue(0, $Sender->RequestArgs, '');
    $Sender->UserName = ArrayValue(1, $Sender->RequestArgs, '');
    $Sender->GetUserInfo($Sender->UserID, $Sender->UserName);
+   $Sender->AddCssFile('/plugins/AboutMe/design/am.default_theme.css'); // change this to use a different css stylesheet i.e. from am.default_theme.css to am.realgamerstheme.css
    $Sender->SetTabView('aboutme', dirname(__FILE__).DS.'views'.DS.'aboutme_view.php', 'Profile', 'Dashboard');
        //$UserInfoModule = new UserInfoModule($this);
        //$UserInfoModule->User = $this->User;
@@ -183,7 +183,7 @@ public function Setup(){
 }
 
 Gdn::FactoryInstall('AboutMeModel','AboutMeModel',
-PATH_PLUGINS.DS.'AboutMe'.DS.'class.aboutme.plugin.php',
+PATH_PLUGINS.DS.'AboutMe'.DS.'class.aboutmemodel.php',
 Gdn::FactoryInstance,NULL,FALSE);
 
 
