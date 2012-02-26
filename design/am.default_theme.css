@@ -76,7 +76,6 @@ div.aboutme td.tablelabel h2{
     margin-bottom: 0px;
     border-bottom: none;
 }
-
 /*================First (Name Info) Table =================*/
 
 div.aboutme table.hasphoto {
@@ -94,8 +93,6 @@ div.aboutme table#nameinfo td.name {
 
 div.aboutme table#nameinfo td.info {
     text-align:left;
-}
-
 /*====================User Photo=====================*/
 
 div.aboutme table#photoinfo {
@@ -103,12 +100,10 @@ div.aboutme table#photoinfo {
     float: left;
 }
 
-
 div.aboutme td.photo img {
     width: 128px;
     height: 128px;
 }
-
 
 /*================Second (Quote Info) Table================*/
 

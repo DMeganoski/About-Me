@@ -5,8 +5,6 @@ Real Name, Nick Name, Favorite Quote, Location, Birthday, Relationship Status, B
 
 The Css file is located in the /design folder, and am.default_theme.css is used by default.
 
-The Css file is located in the /design folder, and am.default_theme.css is used by default.
-
 this can be edited to suit your needs, or replaced; just change the filename at the top of class.aboutme.plugin.php
 
 The css file has all of the colors specifically at the bottom to make it easy to just change the theme's colors.
