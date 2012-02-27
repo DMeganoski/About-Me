@@ -127,7 +127,7 @@ $AllSections = array(
 
 $UserName = $this->User->Name;
 
-// Get User Info
+// Get User Photo
 if (!empty($this->User->Photo)) {
     if (strtolower(substr($this->User->Photo, 0, 7)) != 'http://') {
 	$Photo = Img('uploads/' . ChangeBasename($this->User->Photo, 'p%s'));

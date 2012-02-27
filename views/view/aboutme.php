@@ -33,17 +33,18 @@
 
 
 $Preferences = MyExplode($this->AboutMe->Preferences);
-if (empty($this->AboutMe)) { // if the sender's row in the 'about me' table is empty, tell the user 
+// If the data is empty, return message
+if (empty($this->AboutMe)) {
     ?>
     <div class="Empty">
     <?php echo "This profile hasn't been set up yet."; ?>
     </div>
     <?php
 } else { // else display the page
-    include(PATH_PLUGINS . DS . "AboutMeDev/views/view/shelf.php");
-    ?>
-
-    <div class="aboutme"><?php
+    include(PATH_PLUGINS . DS . "AboutMe/views/view/shelf.php");
+    
+    
+    ?><div class="aboutme"><?php
 //--------------------------Start of php content --------------------------//
     // Blank array to be filled only by enabled sections with information within
     $SectionsWithInfo = array();
@@ -63,10 +64,11 @@ if (empty($this->AboutMe)) { // if the sender's row in the 'about me' table is e
 		}
 	    }
 	}
-    }
+    }    
+    
     foreach($EnabledSections as $Enabled => $Info) {
 	if(in_array($Enabled, $SectionsWithInfo)) {
-	    include(PATH_PLUGINS.DS."AboutMeDev/views/view/sections/".strtolower($Enabled).".php");
+	    include(PATH_PLUGINS.DS."AboutMe/views/view/sections/".strtolower($Enabled).".php");
 	}
     }
     // print_r($EnabledSections);

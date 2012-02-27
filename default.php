@@ -3,31 +3,26 @@
 if (!defined('APPLICATION'))
     exit();
 // Define the plugin:
-$PluginInfo['AboutMeDev'] = array(
-    'Name' => 'AboutMeDev',
-    'Description' => 'This is the development version.',
-    'Version' => '1.1.x',
+$PluginInfo['AboutMe'] = array(
+    'Name' => 'AboutMe',
+    'Description' => 'This plugin adds a new tab and section to the profile, \'About Me\', with customizable user information.',
+    'Version' => '1.5.0',
     'Author' => "Darryl Meganoski",
-    'AuthorEmail' => 'zodiacdm@gmail.com',
-    'AuthorUrl' => 'www.facebook.com/zodiacdm',
+    'AuthorEmail' => 'dmeganoski@gmail.com',
+    'AuthorUrl' => 'www.facebook.com/dmeganoski',
     'HasLocale' => TRUE,
+    'CMSGroup' => 'ProfilePlus',
 );
 
 class AboutMe extends Gdn_Plugin {
 
     /**
      * Adds a tab to the profile.
-     * If you would like this to be the first 'tab' on the list, go to
-     * 'vanilla_folder/applications/dashboard/controllers/class.profilecontroller.php'
-     * and add a
-     * $this->FireEvent('BeforeAddProfileTabs');
-     * somewhere around line 736 of the file,
-     * and change the name of the magic event below to ProfileController_BeforeAddProfileTabs_handler
      */
     public function ProfileController_AddProfileTabs_handler(&$Sender) {
 	$Sender->AddProfileTab('aboutme', "/profile/aboutme/" . $Sender->User->UserID . "/" . Gdn_Format::Url($Sender->User->Name), 'AboutMe', 'About Me');
-	$Sender->AddCssFile('/plugins/AboutMeDev/design/am.default_theme.css');
-	$Sender->AddJsFile('/plugins/AboutMeDev/aboutme.boxlink.js');
+	$Sender->AddCssFile('/plugins/AboutMe/design/am.default_theme.css');
+	$Sender->AddJsFile('/plugins/AboutMe/aboutme.boxlink.js');
     }
 
     /**
@@ -39,11 +34,16 @@ class AboutMe extends Gdn_Plugin {
 	$Session = Gdn::Session();
 	$ViewingUserID = $Session->UserID;
 
+	// if the viewing user is the same as the requested user, add the self-edit link
 	if ($Sender->User->UserID == $ViewingUserID) {
 	    $SideMenu->AddLink('Options', T('Edit My Details'), '/profile/editme/' . $Sender->User->UserID . '/' . Gdn_Format::Url($Sender->User->Name), FALSE, array('class' => 'Popup'));
+	    $Sender->AllowEdit == TRUE;
+	// else only add the link to edit the requested user if the viewing user has the permission to edit users.
 	} else {
 	    $SideMenu->AddLink('Options', T('Edit My Details'), '/profile/editme/' . $Sender->User->UserID . '/' . Gdn_Format::Url($Sender->User->Name), 'Garden.Users.Edit', array('class' => 'Popup'));
 	    return;
+	    if($Sender->Permission('Garden.Users.Edit'))
+		$Sender->AllowEdit == TRUE;
 	}
     }
 
@@ -54,12 +54,13 @@ class AboutMe extends Gdn_Plugin {
 	$Sender->UserID = ArrayValue(0, $Sender->RequestArgs, '');
 	$Sender->UserName = ArrayValue(1, $Sender->RequestArgs, '');
 	$Sender->GetUserInfo($Sender->UserID, $Sender->UserName);
-	$Sender->SetTabView('aboutme', dirname(__FILE__) . DS . 'views/view/aboutme_view.php', 'Profile', 'Dashboard');
+	$Sender->SetTabView('aboutme', dirname(__FILE__) . DS . 'views/view/aboutme.php', 'Profile', 'Dashboard');
 	//$UserInfoModule = new UserInfoModule($this);
 	//$UserInfoModule->User = $this->User;
 	//$UserInfoModule->Roles = $this->Roles;
-
+	// Create the model for the data
 	$AboutMeModel = new Gdn_Model('AboutMe');
+	// Get data related to requested user
 	$AboutMeData = $AboutMeModel->GetWhere(array('UserID' => $Sender->UserID));
 	$AboutMe = $AboutMeData->FirstRow();
 	$Sender->AboutMe = $AboutMe;
@@ -67,108 +68,79 @@ class AboutMe extends Gdn_Plugin {
 	$Sender->HandlerType = HANDLER_TYPE_NORMAL;
 	$Sender->Render();
     }
+
     /**
      * The edit view, creates a basic page and form for the information 
      */
     public function ProfileController_EditMe_Create(&$Sender, $params) {
-	$this->UserID = ArrayValue(0, $Sender->RequestArgs, '');
-	$this->UserName = ArrayValue(1, $Sender->RequestArgs, '');
+	$Sender->UserID = ArrayValue(0, $Sender->RequestArgs, '');
+	$Sender->UserName = ArrayValue(1, $Sender->RequestArgs, '');
 	$Sender->GetUserInfo($Sender->UserID, $Sender->UserName);
-	// change this to use a different css stylesheet i.e. from am.default_theme.css to am.realgamerstheme.css
-	$Sender->AddCssFile(dirname(__FILE__) . DS .'design/am.default_theme.css');
-	$Sender->AddJsFile(PATH_PLUGINS . DS . 'AboutMe/js/form_collapse.js');
 
-	if (!is_numeric($this->UserID)) {
+	if (!is_numeric($Sender->UserID)) {
 
 	    echo '<div class="Empty">Oops, thats not right...</div>';
+	    $Sender->View = PATH_PLUGINS . DS . "AboutMe/views/edit/editme.php";
+	    $Sender->Render();
+	} else {
+
+	    // Check to make sure the user has permission
+	    $Session = Gdn::Session();
+	    $ViewingUserID = $Session->UserID;
+	    if ($Sender->User->UserID != $ViewingUserID) {
+		$Sender->Permission('Garden.Users.Edit');
+		$AboutMeUserID = $Sender->User->UserID;
+		$Sender->AllowEdit = TRUE;
+	    } else {
+		$AboutMeUserID = $ViewingUserID = Gdn::Session()->UserID;
+		$Sender->AllowEdit = TRUE;
+	    }
+
+	    // Create the model and retrieve the data
+	    $AboutMeModel = new Gdn_Model('AboutMe');
+	    $AboutMeData = $AboutMeModel->GetWhere(array('UserID' => $Sender->UserID));
+	    $AboutMe = $AboutMeData->FirstRow();
+	    $Sender->AboutMe = $AboutMe;
+
+	    //$Sender->AddSideMenu('plugin/userlist');
+	    $Sender->Form = new Gdn_Form();
+	    $Sender->Form->SetModel($AboutMeModel);
+	    if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
+		//AND If the table is empty, set the form data
+		if (!empty($Sender->AboutMe)) {
+		    $Sender->Form->SetData($Sender->AboutMe);
+		}
+	    } else { //starts save form
+		if (!empty($Sender->AboutMe)) {
+		    $Sender->Form->SetFormValue('ProfileID', $Sender->AboutMe->ProfileID);
+		    //$Sender->Preferences = MyExplode($Sender->AboutMe->Preferences);
+		}
+		$Sender->Form->SetFormValue('UserID', $Sender->UserID);
+		$Data = $Sender->Form->FormValues();
+		if ($Sender->Form->Save() !== FALSE) {
+		    $Sender->StatusMessage = Gdn::Translate("Your settings have been saved.");
+		    // TODO: Add user activity here
+		} else {
+		    $Sender->StatusMessage = T("Oops, changes not saved");
+		}
+	    } //ends save form
+	    $Sender->View = dirname(__FILE__) . DS . 'views/edit/editme.php';
+
+	    //$Sender->HandlerType = HANDLER_TYPE_NORMAL;
 	    $Sender->Render();
 	}
-	$AboutMeModel = new Gdn_Model('AboutMe');
-	$AboutMeData = $AboutMeModel->GetWhere(array('UserID' => $this->UserID));
-	$AboutMe = $AboutMeData->FirstRow();
-	$Sender->AboutMe = $AboutMe;
-
-	$Session = Gdn::Session();
-	$ViewingUserID = $Session->UserID;
-	if ($Sender->User->UserID != $ViewingUserID) {
-	    $Sender->Permission('Garden.Users.Edit');
-	    $AboutMeUserID = $Sender->User->UserID;
-	} else {
-	    $AboutMeUserID = $ViewingUserID = Gdn::Session()->UserID;
-	}
-
-	//$Sender->AddSideMenu('plugin/userlist');
-	$Sender->Form = new Gdn_Form();
-	$Sender->Form->SetModel($AboutMeModel);
-	if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
-	    //AND If the table is empty, set the form data
-	    if (!empty($Sender->AboutMe)) {
-		$Sender->Form->SetData($Sender->AboutMe);
-	    }
-	} else { //starts save form
-	    if (!empty($Sender->AboutMe)) {
-		$Sender->Form->SetFormValue('ProfileID', $Sender->AboutMe->ProfileID);
-		//$Sender->Preferences = MyExplode($Sender->AboutMe->Preferences);
-	    }
-	    $Sender->Form->SetFormValue('UserID', $this->UserID);
-	    $Data = $Sender->Form->FormValues();
-	    if ($Sender->Form->Save() !== FALSE) {
-		$Sender->StatusMessage = Gdn::Translate("Your settings have been saved.");
-		// Trying to record activity if the person changed his/her info
-		// AddActivity($AboutMeUserID, 'Story', 'has updated his profile');
-	    } else {
-		$Sender->StatusMessage = T("Oops, changes not saved");
-	    }
-	} //ends save form
-	$Sender->View = dirname(__FILE__) . DS . 'views/edit/aboutme_edit.php';
-
-	//$Sender->HandlerType = HANDLER_TYPE_NORMAL;
-	$Sender->Render();
     }
-    
+
+    /**
+     *
+     * @param type $Sender 
+     */
     public function ProfileController_EditMyAccountAfter_Handler($Sender) {
-	echo "<style>#Popup textarea#Form_Address{width: 250px;}</style>";
-	echo "<li>";
-	echo $Sender->Form->Label("First Name");
-	echo $Sender->Form->TextBox('FirstName');
-	echo "</li>";
-	echo "<li>";
-	echo $Sender->Form->Label('LastName');
-	echo $Sender->Form->TextBox("LastName");
-	echo "</li>";
-	echo "<li>";
-	echo $Sender->Form->Label("Birthday");
-	echo $Sender->Form->Date("DateOfBirth");
-	echo "</li>";
-	echo "<li>";
-	echo $Sender->Form->CheckBox('ShowBY', T('Also show the year?'), array('value' => '1'));
-	echo "</li>";
-	echo "<li>";
-	echo $Sender->Form->Label('Address');
-	echo $Sender->Form->TextBox("Address", array('MultiLine' => true, 'rows'=>'30', 'cols'=>'80'));
-	echo "</li>";
-	echo "<li>";
-	echo $Sender->Form->Label('City');
-	echo $Sender->Form->TextBox("City");
-	echo "</li>";
-	echo "<li>";
-	echo $Sender->Form->Label('State');
-	echo $Sender->Form->TextBox("State");
-	echo "</li>";
-	echo "<li>";
-	echo $Sender->Form->Label('Zipcode');
-	echo $Sender->Form->TextBox("Zipcode");
-	echo "</li>";
-	echo "<li>";
-	echo $Sender->Form->Label('Country');
-	echo $Sender->Form->TextBox("Country");
-	echo "</li>";
-	echo "<li>";
-	echo $Sender->Form->Label('Phone Number', 'Phone Number');
-        echo $Sender->Form->TextBox('Phone');
-	echo "</li>";
-	
-	
+
+	// PREP: Allow users to choose prefered display name across the site
+	//$this->NamePreferenceChoices = array('0' => 'User Name','1'=> 'Real Name');
+
+	include_once(PATH_PLUGINS . DS . 'AboutMe/views/edit/account.php');
     }
 
     public function SettingsController_AboutMeSettings_Create($Sender) {
@@ -181,59 +153,30 @@ class AboutMe extends Gdn_Plugin {
 	$Validation = new Gdn_Validation();
 	$ConfigurationModel = new Gdn_ConfigurationModel($Validation);
 	$ConfigurationModel->SetField(array(
-		'Galleries.Items.PerPage',
-		'Galleries.FireEvents.Show'
+	    'Galleries.Items.PerPage',
+	    'Galleries.FireEvents.Show'
 	));
 
-      // Set the model on the form.
-      $this->Form->SetModel($ConfigurationModel);
+	// Set the model on the form.
+	$this->Form->SetModel($ConfigurationModel);
 
-      // If seeing the form for the first time...
-      if ($this->Form->AuthenticatedPostBack() === FALSE) {
-         // Apply the config settings to the form.
-         $this->Form->SetData($ConfigurationModel->Data);
-		} else {
-         // Define some validation rules for the fields being saved
-         $ConfigurationModel->Validation->ApplyRule('Galleries.Items.PerPage', 'Required');
-         $ConfigurationModel->Validation->ApplyRule('Galleries.Items.PerPage', 'Integer');
-         $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.AutoRefresh', 'Integer');
-         $ConfigurationModel->Validation->ApplyRule('Vanilla.Archive.Date', 'Date');
+	// If seeing the form for the first time...
+	if ($this->Form->AuthenticatedPostBack() === FALSE) {
+	    // Apply the config settings to the form.
+	    $this->Form->SetData($ConfigurationModel->Data);
+	} else {
+	    // Define some validation rules for the fields being saved
+	    $ConfigurationModel->Validation->ApplyRule('Galleries.Items.PerPage', 'Required');
+	    $ConfigurationModel->Validation->ApplyRule('Galleries.Items.PerPage', 'Integer');
+	    $ConfigurationModel->Validation->ApplyRule('Vanilla.Comments.AutoRefresh', 'Integer');
+	    $ConfigurationModel->Validation->ApplyRule('Vanilla.Archive.Date', 'Date');
 	}
-	
+
 
 	// Render the custom dashboard view
 	$Sender->Render('dashboardsummaries', '', 'plugins/VanillaStats');
     }
 
-    /**
-     * This method gets called in place of the EntryController's Render method.
-     */
-    public function EntryController_AfterPasswordField_handler(&$Sender) {
-	echo '<li>';
-	echo $this->Form->Label('Address', 'Address');
-	echo $this->Form->TextBox('Address');
-    }
-
-    /* public function ProfileController_AfterPreferencesDefined_Handler(&$Sender) {
-      $Sender->Preferences['Profile Information Visibility'] = array(
-
-      'Everyone.Birthyear' => T('Just hide the year.'),
-      'Everyone.HideSome' => T('Hide my info from the public. (unregistered users)'),
-      'Everyone.HideAll' => T('Hide my info from everyone except staff.'),
-      'Everyone.Birthday' => T('Show my birthday.'),
-
-      'Pulbic.Birthday' => T('Show my birthday.'),
-      'Pulbic.HideAll' => T('Hide my info from everyone except staff.'),
-      'Pulbic.Birthyear' => T('Just hide the year.'),
-      'Pulbic.HideSome' => T('Hide my info from the public. (unregistered users)'),
-
-
-
-
-      );
-
-
-      } */
 
     /* -------------- Functions for imploding and exploding associative arrays ------------- */
     /*
@@ -298,7 +241,7 @@ class AboutMe extends Gdn_Plugin {
 		->Column('Position', 'varchar(64)', TRUE)
 		// Education Info
 		->Column('HighSchool', 'varchar(32)', TRUE)
-		->Column('Colllege', 'varchar(32)', TRUE)
+		->Column('College', 'varchar(32)', TRUE)
 		// Interest fields
 		->Column('Music', 'varchar(128)', TRUE)
 		->Column('Games', 'varchar(128)', TRUE)
@@ -318,7 +261,27 @@ class AboutMe extends Gdn_Plugin {
      */
     public function Setup() {
 	$this->Structure();
+	if (C("Garden.ProfileTabOrder") == NULL)
+	    SaveToConfig('Garden.ProfileTabOrder', array('aboutme'));
+	
+	// check the last version installed.
+	$ThisVersion = $PluginInfo['AboutMe']['Version'];
+	$InstalledVersion = C("Plugins.AboutMe.Version");
+	if (substr($InstalledVersion, 0, 1) == substr($ThisVersion, 0, 1)) {
+	    if (substr($InstalledVersion, 0, 3) == substr($ThisVersion, 0, 3)) {
+		if (substr($InstalledVersion, 0, 5) == substr($ThisVersion, 0, 5)) {
+		    // Versions are the same
+		} else {
+		    $this->OnUpgrade($InstalledVersion);
+		}
+	    } else {
+		$this->OnUpgrade($InstalledVersion);
+	    }
+	} else {
+	    $this->OnUpgrade($InstalledVersion);
+	}
     }
+    
 
     /**
      * Function called when the plugin is disabled. 
@@ -326,8 +289,12 @@ class AboutMe extends Gdn_Plugin {
     public function OnDisable() {
 	
     }
+    
+    public function OnUpgrade($InstalledVersion = '0.0.0') {
+	
+    }
 
 }
 
-Gdn::FactoryInstall('AboutMeModel', 'AboutMeModel', PATH_PLUGINS . DS . 'AboutMe' . DS . 'class.aboutme.plugin.php', Gdn::FactoryInstance, NULL, FALSE);
+Gdn::FactoryInstall('AboutMeModel', 'AboutMeModel', PATH_PLUGINS . DS . 'AboutMe' . DS . 'default.php', Gdn::FactoryInstance, NULL, FALSE);
 ?>

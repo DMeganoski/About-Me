@@ -43,13 +43,13 @@ div.aboutme td {
 }
 div.aboutme td.bordertop {
     height: 1px;
-    widht: 100%;
+    width: 100%;
     border-top: 1px solid;
 }
 
 div.aboutme td.borderbottom {
     height: 1px;
-    widht: 100%;
+    width: 100%;
     border-bottom: 1px solid;
 }
 
